@@ -22,7 +22,7 @@ local hotkeys_popup = require("awful.hotkeys_popup").widget
                       require("awful.hotkeys_popup.keys")
 local my_table      = awful.util.table or gears.table -- 4.{0,1} compatibility
 local dpi           = require("beautiful.xresources").apply_dpi
--- }}}
+-- }}} 
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -68,8 +68,67 @@ awful.spawn.with_shell(
     'dex --environment Awesome --autostart --search-paths "$XDG_CONFIG_DIRS/autostart:$XDG_CONFIG_HOME/autostart"' -- https://github.com/jceb/dex
 )
 --]]
-
 -- }}}
+
+
+--[[ 
+  Timer implementation 
+--]]
+local countdown = {
+    widget   = wibox.widget.textbox(),
+    checkbox = wibox.widget {
+        checked      = false,
+        check_color  = beautiful.fg_focus,  -- customize
+        border_color = beautiful.fg_normal, -- customize
+        border_width = 2,                   -- customize
+        shape        = gears.shape.circle,
+        widget       = wibox.widget.checkbox
+    }
+}
+
+--function countdown.set()
+    --awful.prompt.run {
+        --prompt       = "Countdown minutes: ", -- floats accepted
+        --textbox      = awful.screen.focused().mypromptbox.widget,
+        --exe_callback = function(timeout)
+            --countdown.seconds = tonumber(timeout)
+            --if not countdown.seconds then return end
+            --countdown.checkbox.checked = false
+            --countdown.minute_t = countdown.seconds > 1 and "minutes" or "minute"
+            --countdown.seconds = countdown.seconds * 60
+            --countdown.timer = gears.timer({ timeout = 1 })
+            --countdown.timer:connect_signal("timeout", function()
+                --if countdown.seconds > 0 then
+                    --local minutes = math.floor(countdown.seconds / 60)
+                    --local seconds = math.fmod(countdown.seconds, 60)
+                    --countdown.widget:set_markup(string.format("%d:%02d", minutes, seconds))
+                    --countdown.seconds = countdown.seconds - 1
+                --else
+                    --naughty.notify({
+                        --title = "Countdown",
+                        --text  = string.format("%s %s timeout", timeout, countdown.minute_t)
+                    --})
+                    --countdown.widget:set_markup("")
+                    --countdown.checkbox.checked = true
+                    --countdown.timer:stop()
+                --end
+            --end)
+            --countdown.timer:start()
+        --end
+    --}
+--end
+
+--countdown.checkbox:buttons(awful.util.table.join(
+    --awful.button({}, 1, function() countdown.set() end), -- left click
+    --awful.button({}, 3, function() -- right click
+        --if countdown.timer and countdown.timer.started then
+            --countdown.widget:set_markup("")
+            --countdown.checkbox.checked = false
+            --countdown.timer:stop()
+            --naughty.notify({ title = "Countdown", text  = "Timer stopped" })
+        --end
+    --end)
+--))
 
 -- {{{ Variable definitions
 
@@ -86,16 +145,16 @@ local themes = {
     "vertex",          -- 10
 }
 
-local chosen_theme = themes[5]
+local chosen_theme = themes[7]
 local modkey       = "Mod4"
 local altkey       = "Mod1"
-local terminal     = "urxvtc"
-local vi_focus     = false -- vi-like client focus - https://github.com/lcpz/awesome-copycats/issues/275
-local cycle_prev   = true -- cycle trough all previous client or just the first -- https://github.com/lcpz/awesome-copycats/issues/274
+local terminal     = "gnome-terminal"
 local editor       = os.getenv("EDITOR") or "vim"
-local gui_editor   = os.getenv("GUI_EDITOR") or "gvim"
-local browser      = os.getenv("BROWSER") or "firefox"
-local scrlocker    = "slock"
+local gui_editor   = "gvim"
+local browser      = "firefox"
+local guieditor    = "code"
+local start_scrlocker = "lock_screen.sh --start"
+local stop_scrlocker  = "lock_screen.sh --stop"
 
 awful.util.terminal = terminal
 awful.util.tagnames = { "1", "2", "3", "4", "5" }
@@ -118,7 +177,7 @@ awful.layout.layouts = {
     --awful.layout.suit.corner.se,
     --lain.layout.cascade,
     --lain.layout.cascade.tile,
-    --lain.layout.centerwork,
+    lain.layout.centerwork
     --lain.layout.centerwork.horizontal,
     --lain.layout.termfair,
     --lain.layout.termfair.center,
@@ -260,7 +319,9 @@ globalkeys = my_table.join(
               {description = "take a screenshot", group = "hotkeys"}),
 
     -- X screen locker
-    awful.key({ altkey, "Control" }, "l", function () os.execute(scrlocker) end,
+    awful.key({ altkey, "Control" }, "l", function () os.execute(start_scrlocker) end,
+              {description = "lock screen", group = "hotkeys"}),
+    awful.key({ altkey, "Control" }, "k", function () os.execute(stop_scrlocker) end,
               {description = "lock screen", group = "hotkeys"}),
 
     -- Hotkeys
@@ -335,26 +396,12 @@ globalkeys = my_table.join(
               {description = "jump to urgent client", group = "client"}),
     awful.key({ modkey,           }, "Tab",
         function ()
-            if cycle_prev then
-                awful.client.focus.history.previous()
-            else
-                awful.client.focus.byidx(-1)
-            end
+            awful.client.focus.history.previous()
             if client.focus then
                 client.focus:raise()
             end
         end,
-        {description = "cycle with previous/go back", group = "client"}),
-    awful.key({ modkey, "Shift"   }, "Tab",
-        function ()
-            if cycle_prev then
-                awful.client.focus.byidx(1)
-                if client.focus then
-                    client.focus:raise()
-                end
-            end
-        end,
-        {description = "go forth", group = "client"}),
+        {description = "go back", group = "client"}),
 
     -- Show/Hide Wibox
     awful.key({ modkey }, "b", function ()
@@ -368,9 +415,9 @@ globalkeys = my_table.join(
         {description = "toggle wibox", group = "awesome"}),
 
     -- On the fly useless gaps change
-    awful.key({ altkey, "Control" }, "+", function () lain.util.useless_gaps_resize(1) end,
+    awful.key({ altkey, "Control" }, "]", function () lain.util.useless_gaps_resize(1) end,
               {description = "increment useless gaps", group = "tag"}),
-    awful.key({ altkey, "Control" }, "-", function () lain.util.useless_gaps_resize(-1) end,
+    awful.key({ altkey, "Control" }, "[", function () lain.util.useless_gaps_resize(-1) end,
               {description = "decrement useless gaps", group = "tag"}),
 
     -- Dynamic tagging
@@ -424,6 +471,13 @@ globalkeys = my_table.join(
     -- Dropdown application
     awful.key({ modkey, }, "z", function () awful.screen.focused().quake:toggle() end,
               {description = "dropdown application", group = "launcher"}),
+
+    -- Change Keyboard Layout
+    awful.key({ "Shift", "Control" }, "i", function () os.execute("setxkbmap it") end,
+              {description = "Set keyboard it layout", group = "launcher"}),
+    awful.key({ "Shift", "Control" }, "u", function () os.execute("setxkbmap us") end,
+              {description = "Set keyboard us layout", group = "launcher"}),
+    
 
     -- Widgets popups
     awful.key({ altkey, }, "c", function () if beautiful.cal then beautiful.cal.show(7) end end,
@@ -688,16 +742,13 @@ awful.rules.rules = {
      }
     },
 
-    -- Titlebars
+     --Titlebars
     { rule_any = { type = { "dialog", "normal" } },
       properties = { titlebars_enabled = true } },
 
     -- Set Firefox to always map on the first tag on screen 1.
-    { rule = { class = "Firefox" },
-      properties = { screen = 1, tag = awful.util.tagnames[1] } },
-
-    { rule = { class = "Gimp", role = "gimp-image-window" },
-          properties = { maximized = true } },
+    --{ rule = { class = "Firefox" },
+      --properties = { screen = 1, tag = awful.util.tagnames[1] } },
 }
 -- }}}
 
@@ -758,6 +809,7 @@ client.connect_signal("request::titlebars", function(c)
             awful.titlebar.widget.stickybutton   (c),
             awful.titlebar.widget.ontopbutton    (c),
             awful.titlebar.widget.closebutton    (c),
+            --awful.titlebar.widget.countdown.widget (c),
             layout = wibox.layout.fixed.horizontal()
         },
         layout = wibox.layout.align.horizontal
@@ -766,7 +818,7 @@ end)
 
 -- Enable sloppy focus, so that focus follows mouse.
 client.connect_signal("mouse::enter", function(c)
-    c:emit_signal("request::activate", "mouse_enter", {raise = vi_focus})
+    c:emit_signal("request::activate", "mouse_enter", {raise = true})
 end)
 
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
