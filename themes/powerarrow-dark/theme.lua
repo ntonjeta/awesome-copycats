@@ -10,6 +10,8 @@ local lain  = require("lain")
 local awful = require("awful")
 local wibox = require("wibox")
 local dpi   = require("beautiful.xresources").apply_dpi
+local naughty = require("naughty")
+local beautiful = require("beautiful")
 
 local os = os
 local my_table = awful.util.table or gears.table -- 4.{0,1} compatibility
@@ -111,7 +113,7 @@ theme.cal = lain.widget.cal({
 })
 
 -- Mail IMAP check
-local mailicon = wibox.widget.imagebox(theme.widget_mail)
+--local mailicon = wibox.widget.imagebox(theme.widget_mail)
 --[[ commented because it needs to be set before use
 mailicon:buttons(my_table.join(awful.button({ }, 1, function () awful.spawn(mail) end)))
 theme.mail = lain.widget.imap({
@@ -132,40 +134,40 @@ theme.mail = lain.widget.imap({
 --]]
 
 -- MPD
-local musicplr = awful.util.terminal .. " -title Music -g 130x34-320+16 -e ncmpcpp"
-local mpdicon = wibox.widget.imagebox(theme.widget_music)
-mpdicon:buttons(my_table.join(
-    awful.button({ modkey }, 1, function () awful.spawn.with_shell(musicplr) end),
-    awful.button({ }, 1, function ()
-        os.execute("mpc prev")
-        theme.mpd.update()
-    end),
-    awful.button({ }, 2, function ()
-        os.execute("mpc toggle")
-        theme.mpd.update()
-    end),
-    awful.button({ }, 3, function ()
-        os.execute("mpc next")
-        theme.mpd.update()
-    end)))
-theme.mpd = lain.widget.mpd({
-    settings = function()
-        if mpd_now.state == "play" then
-            artist = " " .. mpd_now.artist .. " "
-            title  = mpd_now.title  .. " "
-            mpdicon:set_image(theme.widget_music_on)
-        elseif mpd_now.state == "pause" then
-            artist = " mpd "
-            title  = "paused "
-        else
-            artist = ""
-            title  = ""
-            mpdicon:set_image(theme.widget_music)
-        end
+--local musicplr = awful.util.terminal .. " -title Music -g 130x34-320+16 -e ncmpcpp"
+--local mpdicon = wibox.widget.imagebox(theme.widget_music)
+--mpdicon:buttons(my_table.join(
+    --awful.button({ modkey }, 1, function () awful.spawn.with_shell(musicplr) end),
+    --awful.button({ }, 1, function ()
+        --os.execute("mpc prev")
+        --theme.mpd.update()
+    --end),
+    --awful.button({ }, 2, function ()
+        --os.execute("mpc toggle")
+        --theme.mpd.update()
+    --end),
+    --awful.button({ }, 3, function ()
+        --os.execute("mpc next")
+        --theme.mpd.update()
+    --end)))
+--theme.mpd = lain.widget.mpd({
+    --settings = function()
+        --if mpd_now.state == "play" then
+            --artist = " " .. mpd_now.artist .. " "
+            --title  = mpd_now.title  .. " "
+            --mpdicon:set_image(theme.widget_music_on)
+        --elseif mpd_now.state == "pause" then
+            --artist = " mpd "
+            --title  = "paused "
+        --else
+            --artist = ""
+            --title  = ""
+            --mpdicon:set_image(theme.widget_music)
+        --end
 
-        widget:set_markup(markup.font(theme.font, markup("#EA6F81", artist) .. title))
-    end
-})
+        --widget:set_markup(markup.font(theme.font, markup("#EA6F81", artist) .. title))
+    --end
+--})
 
 -- MEM
 local memicon = wibox.widget.imagebox(theme.widget_mem)
@@ -174,7 +176,6 @@ local mem = lain.widget.mem({
         widget:set_markup(markup.font(theme.font, " " .. mem_now.used .. "MB "))
     end
 })
-
 -- CPU
 local cpuicon = wibox.widget.imagebox(theme.widget_cpu)
 local cpu = lain.widget.cpu({
@@ -192,7 +193,7 @@ local temp = lain.widget.temp({
 })
 
 -- / fs
-local fsicon = wibox.widget.imagebox(theme.widget_hdd)
+--local fsicon = wibox.widget.imagebox(theme.widget_hdd)
 --[[ commented because it needs Gio/Glib >= 2.54
 theme.fs = lain.widget.fs({
     notification_preset = { fg = theme.fg_normal, bg = theme.bg_normal, font = "Terminus 10" },
@@ -263,6 +264,65 @@ local net = lain.widget.net({
     end
 })
 
+-- Countdown timer  
+-- TODO Export function in external file. 
+-- FIXME Timer don't work well
+local countdown = {
+    widget   = wibox.widget.textbox(),
+    checkbox = wibox.widget {
+        checked      = false,
+        check_color  = beautiful.fg_focus,  -- customize
+        border_color = beautiful.fg_normal, -- customize
+        border_width = 2,                   -- customize
+        shape        = gears.shape.circle,
+        widget       = wibox.widget.checkbox
+    }
+}
+
+function countdown.set()
+    awful.prompt.run {
+        prompt       = "Countdown minutes: ", -- floats accepted
+        textbox      = awful.screen.focused().mypromptbox.widget,
+        exe_callback = function(timeout)
+            countdown.seconds = tonumber(timeout)
+            if not countdown.seconds then return end
+            countdown.checkbox.checked = false
+            countdown.minute_t = countdown.seconds > 1 and "minutes" or "minute"
+            countdown.seconds = countdown.seconds * 60
+            countdown.timer = gears.timer({ timeout = 1 })
+            countdown.timer:connect_signal("timeout", function()
+                if countdown.seconds > 0 then
+                    local minutes = math.floor(countdown.seconds / 60)
+                    local seconds = math.fmod(countdown.seconds, 60)
+                    countdown.widget:set_markup(string.format("%d:%02d", minutes, seconds))
+                    countdown.seconds = countdown.seconds - 1
+                else
+                    naughty.notify({
+                        title = "Countdown",
+                        text  = string.format("%s %s timeout", timeout, countdown.minute_t)
+                    })
+                    countdown.widget:set_markup("")
+                    countdown.checkbox.checked = true
+                    countdown.timer:stop()
+                end
+            end)
+            countdown.timer:start()
+        end
+    }
+end
+
+countdown.checkbox:buttons(awful.util.table.join(
+    awful.button({}, 1, function() countdown.set() end), -- left click
+    awful.button({}, 3, function() -- right click
+        if countdown.timer and countdown.timer.started then
+            countdown.widget:set_markup("")
+            countdown.checkbox.checked = false
+            countdown.timer:stop()
+            naughty.notify({ title = "Countdown", text  = "Timer stopped" })
+        end
+    end)
+))
+
 -- Separators
 local spr     = wibox.widget.textbox(' ')
 local arrl_dl = separators.arrow_left(theme.bg_focus, "alpha")
@@ -317,15 +377,12 @@ function theme.at_screen_connect(s)
             layout = wibox.layout.fixed.horizontal,
             wibox.widget.systray(),
             spr,
-            arrl_ld,
-            wibox.container.background(mpdicon, theme.bg_focus),
-            wibox.container.background(theme.mpd.widget, theme.bg_focus),
             arrl_dl,
+            countdown.widget,
+            countdown.checkbox,
+            arrl_ld,
             volicon,
             theme.volume.widget,
-            arrl_ld,
-            wibox.container.background(mailicon, theme.bg_focus),
-            --wibox.container.background(theme.mail.widget, theme.bg_focus),
             arrl_dl,
             memicon,
             mem.widget,
@@ -335,10 +392,7 @@ function theme.at_screen_connect(s)
             arrl_dl,
             tempicon,
             temp.widget,
-            arrl_ld,
-            wibox.container.background(fsicon, theme.bg_focus),
-            --wibox.container.background(theme.fs.widget, theme.bg_focus),
-            arrl_dl,
+            spr,
             baticon,
             bat.widget,
             arrl_ld,
