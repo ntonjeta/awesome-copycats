@@ -149,6 +149,7 @@ local chosen_theme = themes[7]
 local modkey       = "Mod4"
 local altkey       = "Mod1"
 local terminal     = "gnome-terminal"
+local dropdown_terminal = "urxvt"
 local editor       = os.getenv("EDITOR") or "vim"
 local gui_editor   = "gvim"
 local browser      = "firefox"
@@ -157,6 +158,7 @@ local start_scrlocker = "lock_screen.sh --start"
 local stop_scrlocker  = "lock_screen.sh --stop"
 
 awful.util.terminal = terminal
+awful.util.dropdown_terminal = dropdown_terminal
 awful.util.tagnames = { "1", "2", "3", "4", "5" }
 awful.layout.layouts = {
     awful.layout.suit.floating,
