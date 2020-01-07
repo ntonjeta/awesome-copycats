@@ -361,9 +361,9 @@ globalkeys = my_table.join(
               {description = "increment useless gaps", group = "tag"}),
     awful.key({ altkey, "Control" }, "[", function () lain.util.useless_gaps_resize(-1) end,
               {description = "decrement useless gaps", group = "tag"}),
-    awful.key({ altkey, "Shift"   }, "=",     function () awful.tag.incmwfact( 0.05)          end,
-              {description = "increase master width factor", group = "layout"}),
-    awful.key({ altkey, "Shift"   }, "-",     function () awful.tag.incmwfact(-0.05)          end,
+    awful.key({ altkey, "Control"   }, "=",     function () awful.tag.incmwfact( 0.05)          end,
+    {description = "increase master width factor", group = "layout"}),
+    awful.key({ altkey, "Control"   }, "-",     function () awful.tag.incmwfact(-0.05)          end,
               {description = "decrease master width factor", group = "layout"}),
 
     -- Dynamic tagging
