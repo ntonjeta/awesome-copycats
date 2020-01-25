@@ -94,8 +94,8 @@ local editor       = os.getenv("EDITOR") or "vim"
 local gui_editor   = "gvim"
 local browser      = "firefox"
 local guieditor    = "code"
-local start_scrlocker = "lock_screen.sh --start"
-local stop_scrlocker  = "lock_screen.sh --stop"
+local start_scrlocker = "/home/ntonjeta/.local/bin/lock_screen --start"
+local stop_scrlocker  = "/home/ntonjeta/.local/bin/lock_screen --stop"
 
 awful.util.terminal = terminal
 awful.util.dropdown_terminal = dropdown_terminal
