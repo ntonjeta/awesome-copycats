@@ -105,6 +105,7 @@ local editor       = os.getenv("EDITOR") or "vim"
 local gui_editor   = "code"
 local browser      = "firefox"
 local guieditor    = "code"
+local screenshot   = "/home/ntonjeta/.local/bin/screenshot"
 local start_scrlocker = "/home/ntonjeta/.local/bin/lock_screen --start"
 local stop_scrlocker  = "/home/ntonjeta/.local/bin/lock_screen --stop"
 
@@ -273,7 +274,7 @@ globalkeys = mytable.join(
               {description = "destroy all notifications", group = "hotkeys"}),
     -- Take a screenshot
     -- https://github.com/lcpz/dots/blob/master/bin/screenshot
-    awful.key({ altkey }, "p", function() os.execute("screenshot") end,
+    awful.key({ altkey , "Control" }, "p", function() os.execute(screenshot) end,
               {description = "take a screenshot", group = "hotkeys"}),
 
     -- X screen locker
