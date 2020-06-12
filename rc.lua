@@ -91,10 +91,9 @@ local altkey       = "Mod1"
 local terminal     = "urxvt"
 local dropdown_terminal = "urxvt"
 local editor       = os.getenv("EDITOR") or "vim"
-local gui_editor   = "gvim"
 local browser      = "firefox"
 local audio_control = "pavucontrol"
-local guieditor    = "code"
+local code_editor   = "code"
 local screenshot   = "/home/ntonjeta/.local/bin/screenshot"
 local start_scrlocker = "/home/ntonjeta/.local/bin/lock_screen --start"
 local stop_scrlocker  = "/home/ntonjeta/.local/bin/lock_screen --stop"
@@ -473,7 +472,9 @@ globalkeys = my_table.join(
     awful.key({ modkey }, "q", function () awful.spawn(browser) end,
               {description = "run browser", group = "launcher"}),
     awful.key({ modkey }, "a", function () awful.spawn(audio_control) end,
-              {description = "run gui editor", group = "launcher"}),
+              {description = "run audio controlelr", group = "launcher"}),
+    awful.key({ modkey }, "c", function () awful.spawn(code_editor) end,
+              {description = "run code editor", group = "launcher"}),
 
     -- Prompt
     awful.key({ modkey }, "r", function () awful.screen.focused().mypromptbox:run() end,
