@@ -104,7 +104,8 @@ local terminal     = "urxvtc"
 local editor       = os.getenv("EDITOR") or "vim"
 local gui_editor   = "code"
 local browser      = "firefox"
-local guieditor    = "code"
+local audio_control = "pavucontrol"
+local code_editor   = "code"
 local screenshot   = "/home/ntonjeta/.local/bin/screenshot"
 local start_scrlocker = "/home/ntonjeta/.local/bin/lock_screen --start"
 local stop_scrlocker  = "/home/ntonjeta/.local/bin/lock_screen --stop"
@@ -537,6 +538,10 @@ globalkeys = mytable.join(
     -- User programs
     awful.key({ modkey }, "q", function () awful.spawn(browser) end,
               {description = "run browser", group = "launcher"}),
+    awful.key({ modkey }, "a", function () awful.spawn(audio_control) end,
+              {description = "run audio controlelr", group = "launcher"}),
+    awful.key({ modkey }, "c", function () awful.spawn(code_editor) end,
+              {description = "run code editor", group = "launcher"}),
 
     -- Default
     --[[ Menubar
