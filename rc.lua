@@ -102,6 +102,7 @@ local terminal     = "urxvtc"
 local editor       = os.getenv("EDITOR") or "vim"
 local gui_editor   = "code"
 local browser      = "firefox"
+local chromium      = "chromium"
 local audio_control = "pavucontrol"
 local code_editor   = "code"
 local screenshot   = "/home/ntonjeta/.local/bin/screenshot"
@@ -536,6 +537,8 @@ globalkeys = mytable.join(
     -- User programs
     awful.key({ modkey }, "q", function () awful.spawn(browser) end,
               {description = "run browser", group = "launcher"}),
+    awful.key({ modkey, "Control" }, "q", function () awful.spawn(chromium) end,
+              {description = "run chromium", group = "launcher"}),
     awful.key({ modkey }, "a", function () awful.spawn(audio_control) end,
               {description = "run audio controlelr", group = "launcher"}),
     awful.key({ modkey }, "c", function () awful.spawn(code_editor) end,
