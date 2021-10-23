@@ -22,7 +22,7 @@ local hotkeys_popup = require("awful.hotkeys_popup").widget
                       require("awful.hotkeys_popup.keys")
 local my_table      = awful.util.table or gears.table -- 4.{0,1} compatibility
 local dpi           = require("beautiful.xresources").apply_dpi
--- }}} 
+-- }}}
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -60,12 +60,15 @@ end
 run_once({ "urxvtd", "unclutter -root" }) -- entries must be separated by commas
 
 -- This function implements the XDG autostart specification
+--[[
 awful.spawn.with_shell(
     'if (xrdb -query | grep -q "^awesome\\.started:\\s*true$"); then exit; fi;' ..
     'xrdb -merge <<< "awesome.started:true";' ..
     -- list each of your autostart commands, followed by ; inside single quotes, followed by ..
     'dex --environment Awesome --autostart --search-paths "$XDG_CONFIG_DIRS/autostart:$XDG_CONFIG_HOME/autostart"' -- https://github.com/jceb/dex
 )
+--]]
+
 -- }}}
 
 -- {{{ Variable definitions
@@ -98,7 +101,6 @@ local start_scrlocker = "/home/ntonjeta/.local/bin/lock_screen --start"
 local stop_scrlocker  = "/home/ntonjeta/.local/bin/lock_screen --stop"
 
 awful.util.terminal = terminal
-awful.util.dropdown_terminal = dropdown_terminal
 awful.util.tagnames = { "1", "2", "3", "4", "5" }
 awful.layout.layouts = {
     awful.layout.suit.floating,
@@ -119,7 +121,7 @@ awful.layout.layouts = {
     --awful.layout.suit.corner.se,
     --lain.layout.cascade,
     --lain.layout.cascade.tile,
-    lain.layout.centerwork
+    --lain.layout.centerwork,
     --lain.layout.centerwork.horizontal,
     --lain.layout.termfair,
     --lain.layout.termfair.center,
@@ -257,13 +259,11 @@ root.buttons(my_table.join(
 globalkeys = my_table.join(
     -- Take a screenshot
     -- https://github.com/lcpz/dots/blob/master/bin/screenshot
-    awful.key({ altkey , "Control" }, "p", function() os.execute(screenshot) end,
+    awful.key({ altkey }, "p", function() os.execute("screenshot") end,
               {description = "take a screenshot", group = "hotkeys"}),
 
     -- X screen locker
-    awful.key({ altkey, "Control" }, "l", function () os.execute(start_scrlocker) end,
-              {description = "lock screen", group = "hotkeys"}),
-    awful.key({ altkey, "Control" }, "k", function () os.execute(stop_scrlocker) end,
+    awful.key({ altkey, "Control" }, "l", function () os.execute(scrlocker) end,
               {description = "lock screen", group = "hotkeys"}),
 
     -- Hotkeys
@@ -338,14 +338,28 @@ globalkeys = my_table.join(
               {description = "jump to urgent client", group = "client"}),
     awful.key({ modkey,           }, "Tab",
         function ()
-            awful.client.focus.history.previous()
+            if cycle_prev then
+                awful.client.focus.history.previous()
+            else
+                awful.client.focus.byidx(-1)
+            end
             if client.focus then
                 client.focus:raise()
             end
         end,
-        {description = "go back", group = "client"}),
+        {description = "cycle with previous/go back", group = "client"}),
 
-    -- Show/Hide Wibox
+    awful.key({ modkey, "Shift"   }, "Tab",
+        function ()
+            if cycle_prev then
+                awful.client.focus.byidx(1)
+                if client.focus then
+                    client.focus:raise()
+                end
+            end
+        end,
+        {description = "go forth", group = "client"}),
+    -- Show/hide wibox
     awful.key({ modkey }, "b", function ()
             for s in screen do
                 s.mywibox.visible = not s.mywibox.visible
@@ -357,14 +371,10 @@ globalkeys = my_table.join(
         {description = "toggle wibox", group = "awesome"}),
 
     -- On the fly useless gaps change
-    awful.key({ altkey, "Control" }, "]", function () lain.util.useless_gaps_resize(1) end,
+    awful.key({ altkey, "Control" }, "+", function () lain.util.useless_gaps_resize(1) end,
               {description = "increment useless gaps", group = "tag"}),
-    awful.key({ altkey, "Control" }, "[", function () lain.util.useless_gaps_resize(-1) end,
+    awful.key({ altkey, "Control" }, "-", function () lain.util.useless_gaps_resize(-1) end,
               {description = "decrement useless gaps", group = "tag"}),
-    awful.key({ altkey, "Control"   }, "=",     function () awful.tag.incmwfact( 0.05)          end,
-    {description = "increase master width factor", group = "layout"}),
-    awful.key({ altkey, "Control"   }, "-",     function () awful.tag.incmwfact(-0.05)          end,
-              {description = "decrease master width factor", group = "layout"}),
 
     -- Dynamic tagging
     awful.key({ modkey, "Shift" }, "n", function () lain.util.add_tag() end,
@@ -386,6 +396,10 @@ globalkeys = my_table.join(
     awful.key({ modkey, "Shift"   }, "q", awesome.quit,
               {description = "quit awesome", group = "awesome"}),
 
+    awful.key({ modkey, altkey    }, "l",     function () awful.tag.incmwfact( 0.05)          end,
+              {description = "increase master width factor", group = "layout"}),
+    awful.key({ modkey, altkey    }, "h",     function () awful.tag.incmwfact(-0.05)          end,
+              {description = "decrease master width factor", group = "layout"}),
     awful.key({ modkey, "Shift"   }, "h",     function () awful.tag.incnmaster( 1, nil, true) end,
               {description = "increase the number of master clients", group = "layout"}),
     awful.key({ modkey, "Shift"   }, "l",     function () awful.tag.incnmaster(-1, nil, true) end,
@@ -414,20 +428,13 @@ globalkeys = my_table.join(
     awful.key({ modkey, }, "z", function () awful.screen.focused().quake:toggle() end,
               {description = "dropdown application", group = "launcher"}),
 
-    -- Change Keyboard Layout
-    awful.key({ "Shift", "Control" }, "i", function () os.execute("setxkbmap it") end,
-              {description = "Set keyboard it layout", group = "launcher"}),
-    awful.key({ "Shift", "Control" }, "u", function () os.execute("setxkbmap us") end,
-              {description = "Set keyboard us layout", group = "launcher"}),
-    
-
     -- Widgets popups
-    --awful.key({ altkey, }, "c", function () if beautiful.cal then beautiful.cal.show(7) end end,
-              --{description = "show calendar", group = "widgets"}),
-    --awful.key({ altkey, }, "h", function () if beautiful.fs then beautiful.fs.show(7) end end,
-              --{description = "show filesystem", group = "widgets"}),
-    --awful.key({ altkey, }, "w", function () if beautiful.weather then beautiful.weather.show(7) end end,
-              --{description = "show weather", group = "widgets"}),
+    awful.key({ altkey, }, "c", function () if beautiful.cal then beautiful.cal.show(7) end end,
+              {description = "show calendar", group = "widgets"}),
+    awful.key({ altkey, }, "h", function () if beautiful.fs then beautiful.fs.show(7) end end,
+              {description = "show filesystem", group = "widgets"}),
+    awful.key({ altkey, }, "w", function () if beautiful.weather then beautiful.weather.show(7) end end,
+              {description = "show weather", group = "widgets"}),
 
     -- Brightness
     awful.key({ }, "XF86MonBrightnessUp", function () os.execute("xbacklight -inc 10") end,
@@ -467,16 +474,79 @@ globalkeys = my_table.join(
         end,
         {description = "volume 0%", group = "hotkeys"}),
 
+    -- MPD control
+    awful.key({ altkey, "Control" }, "Up",
+        function ()
+            os.execute("mpc toggle")
+            beautiful.mpd.update()
+        end,
+        {description = "mpc toggle", group = "widgets"}),
+    awful.key({ altkey, "Control" }, "Down",
+        function ()
+            os.execute("mpc stop")
+            beautiful.mpd.update()
+        end,
+        {description = "mpc stop", group = "widgets"}),
+    awful.key({ altkey, "Control" }, "Left",
+        function ()
+            os.execute("mpc prev")
+            beautiful.mpd.update()
+        end,
+        {description = "mpc prev", group = "widgets"}),
+    awful.key({ altkey, "Control" }, "Right",
+        function ()
+            os.execute("mpc next")
+            beautiful.mpd.update()
+        end,
+        {description = "mpc next", group = "widgets"}),
+    awful.key({ altkey }, "0",
+        function ()
+            local common = { text = "MPD widget ", position = "top_middle", timeout = 2 }
+            if beautiful.mpd.timer.started then
+                beautiful.mpd.timer:stop()
+                common.text = common.text .. lain.util.markup.bold("OFF")
+            else
+                beautiful.mpd.timer:start()
+                common.text = common.text .. lain.util.markup.bold("ON")
+            end
+            naughty.notify(common)
+        end,
+        {description = "mpc on/off", group = "widgets"}),
+
+    -- Copy primary to clipboard (terminals to gtk)
+    awful.key({ modkey }, "c", function () awful.spawn.with_shell("xsel | xsel -i -b") end,
+              {description = "copy terminal to gtk", group = "hotkeys"}),
+    -- Copy clipboard to primary (gtk to terminals)
+    awful.key({ modkey }, "v", function () awful.spawn.with_shell("xsel -b | xsel") end,
+              {description = "copy gtk to terminal", group = "hotkeys"}),
+
     -- User programs
     awful.key({ modkey }, "q", function () awful.spawn(browser) end,
               {description = "run browser", group = "launcher"}),
-    awful.key({ modkey, "Control" }, "q", function () awful.spawn(chromium) end,
-              {description = "run chromium", group = "launcher"}),
-    awful.key({ modkey }, "a", function () awful.spawn(audio_control) end,
-              {description = "run audio controlelr", group = "launcher"}),
-    awful.key({ modkey }, "c", function () awful.spawn(code_editor) end,
-              {description = "run code editor", group = "launcher"}),
+    awful.key({ modkey }, "a", function () awful.spawn(gui_editor) end,
+              {description = "run gui editor", group = "launcher"}),
 
+    -- Default
+    --[[ Menubar
+    awful.key({ modkey }, "p", function() menubar.show() end,
+              {description = "show the menubar", group = "launcher"})
+    --]]
+    --[[ dmenu
+    awful.key({ modkey }, "x", function ()
+            os.execute(string.format("dmenu_run -i -fn 'Monospace' -nb '%s' -nf '%s' -sb '%s' -sf '%s'",
+            beautiful.bg_normal, beautiful.fg_normal, beautiful.bg_focus, beautiful.fg_focus))
+        end,
+        {description = "show dmenu", group = "launcher"})
+    --]]
+    -- alternatively use rofi, a dmenu-like application with more features
+    -- check https://github.com/DaveDavenport/rofi for more details
+    --[[ rofi
+    awful.key({ modkey }, "x", function ()
+            os.execute(string.format("rofi -show %s -theme %s",
+            'run', 'dmenu'))
+        end,
+        {description = "show rofi", group = "launcher"}),
+    --]]
     -- Prompt
     awful.key({ modkey }, "r", function () awful.screen.focused().mypromptbox:run() end,
               {description = "run prompt", group = "launcher"}),
@@ -621,13 +691,45 @@ awful.rules.rules = {
      }
     },
 
-     --Titlebars
-    { rule_any = { type = { "dialog", "normal" } },
-      properties = { titlebars_enabled = true } },
+    -- Floating clients.
+    { rule_any = {
+        instance = {
+          "DTA",  -- Firefox addon DownThemAll.
+          "copyq",  -- Includes session name in class.
+          "pinentry",
+        },
+        class = {
+          "Arandr",
+          "Blueman-manager",
+          "Gpick",
+          "Kruler",
+          "MessageWin",  -- kalarm.
+          "Sxiv",
+          "Tor Browser", -- Needs a fixed window size to avoid fingerprinting by screen size.
+          "Wpa_gui",
+          "veromix",
+          "xtightvncviewer"},
 
-    -- Set Firefox to always map on the first tag on screen 1.
-    --{ rule = { class = "Firefox" },
-      --properties = { screen = 1, tag = awful.util.tagnames[1] } },
+        -- Note that the name property shown in xprop might be set slightly after creation of the client
+        -- and the name shown there might not match defined rules here.
+        name = {
+          "Event Tester",  -- xev.
+        },
+        role = {
+          "AlarmWindow",  -- Thunderbird's calendar.
+          "ConfigManager",  -- Thunderbird's about:config.
+          "pop-up",       -- e.g. Google Chrome's (detached) Developer Tools.
+        }
+      }, properties = { floating = true }},
+
+    -- Add titlebars to normal clients and dialogs
+    { rule_any = {type = { "normal", "dialog" }
+      }, properties = { titlebars_enabled = true }
+    },
+
+    -- Set Firefox to always map on the tag named "2" on screen 1.
+    -- { rule = { class = "Firefox" },
+    --   properties = { screen = 1, tag = "2" } },
 }
 -- }}}
 
@@ -688,7 +790,6 @@ client.connect_signal("request::titlebars", function(c)
             awful.titlebar.widget.stickybutton   (c),
             awful.titlebar.widget.ontopbutton    (c),
             awful.titlebar.widget.closebutton    (c),
-            --awful.titlebar.widget.countdown.widget (c),
             layout = wibox.layout.fixed.horizontal()
         },
         layout = wibox.layout.align.horizontal
@@ -697,7 +798,7 @@ end)
 
 -- Enable sloppy focus, so that focus follows mouse.
 client.connect_signal("mouse::enter", function(c)
-    c:emit_signal("request::activate", "mouse_enter", {raise = true})
+    c:emit_signal("request::activate", "mouse_enter", {raise = vi_focus})
 end)
 
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
