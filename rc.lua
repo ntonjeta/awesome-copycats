@@ -282,6 +282,12 @@ globalkeys = mytable.join(
               {description = "lock screen", group = "hotkeys"}),
     awful.key({ altkey, "Control" }, "k", function () os.execute(stop_scrlocker) end,
               {description = "lock screen", group = "hotkeys"}),
+   
+    -- Change Keyboard Layout
+    awful.key({ "Shift", "Control" }, "i", function () os.execute("setxkbmap it") end,
+              {description = "Set keyboard it layout", group = "launcher"}),
+    awful.key({ "Shift", "Control" }, "u", function () os.execute("setxkbmap us") end,
+              {description = "Set keyboard us layout", group = "launcher"}),
 
     -- Show help
     awful.key({ modkey,           }, "s",      hotkeys_popup.show_help,
@@ -405,6 +411,10 @@ globalkeys = mytable.join(
               {description = "reload awesome", group = "awesome"}),
     awful.key({ modkey, "Shift"   }, "q", awesome.quit,
               {description = "quit awesome", group = "awesome"}),
+
+    -- audio spawn pavucontroll 
+    awful.key({ modkey,           }, "a", function () awful.spawn(audio_control) end,
+              {description = "open a audio controll", group = "launcher"}),
 
     awful.key({ modkey, altkey    }, "l",     function () awful.tag.incmwfact( 0.05)          end,
               {description = "increase master width factor", group = "layout"}),
