@@ -101,6 +101,7 @@ local start_scrlocker = "/home/ntonjeta/.local/bin/lock_screen --start"
 local stop_scrlocker  = "/home/ntonjeta/.local/bin/lock_screen --stop"
 
 awful.util.terminal = terminal
+awful.util.dropdown_terminal = dropdown_terminal
 awful.util.tagnames = { "1", "2", "3", "4", "5" }
 awful.layout.layouts = {
     awful.layout.suit.floating,
@@ -263,8 +264,16 @@ globalkeys = my_table.join(
               {description = "take a screenshot", group = "hotkeys"}),
 
     -- X screen locker
-    awful.key({ altkey, "Control" }, "l", function () os.execute(scrlocker) end,
+    awful.key({ altkey, "Control" }, "l", function () os.execute(start_scrlocker) end,
               {description = "lock screen", group = "hotkeys"}),
+    awful.key({ altkey, "Control" }, "k", function () os.execute(stop_scrlocker) end,
+              {description = "lock screen", group = "hotkeys"}),
+
+    -- Change Keyboard Layout
+    awful.key({ "Shift", "Control" }, "i", function () os.execute("setxkbmap it") end,
+              {description = "Set keyboard it layout", group = "launcher"}),
+    awful.key({ "Shift", "Control" }, "u", function () os.execute("setxkbmap us") end,
+              {description = "Set keyboard us layout", group = "launcher"}),
 
     -- Hotkeys
     awful.key({ modkey,           }, "s",      hotkeys_popup.show_help,
@@ -395,6 +404,10 @@ globalkeys = my_table.join(
               {description = "reload awesome", group = "awesome"}),
     awful.key({ modkey, "Shift"   }, "q", awesome.quit,
               {description = "quit awesome", group = "awesome"}),
+
+    -- audio spawn pavucontroll 
+    awful.key({ modkey,           }, "a", function () awful.spawn(audio_control) end,
+              {description = "open a audio controll", group = "launcher"}),
 
     awful.key({ modkey, altkey    }, "l",     function () awful.tag.incmwfact( 0.05)          end,
               {description = "increase master width factor", group = "layout"}),
