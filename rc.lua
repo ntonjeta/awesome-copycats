@@ -109,8 +109,8 @@ awful.layout.layouts = {
     awful.layout.suit.tile.left,
     awful.layout.suit.tile.bottom,
     awful.layout.suit.tile.top,
-    --awful.layout.suit.fair,
-    --awful.layout.suit.fair.horizontal,
+    awful.layout.suit.fair,
+    awful.layout.suit.fair.horizontal,
     --awful.layout.suit.spiral,
     --awful.layout.suit.spiral.dwindle,
     --awful.layout.suit.max,
@@ -260,7 +260,7 @@ root.buttons(my_table.join(
 globalkeys = my_table.join(
     -- Take a screenshot
     -- https://github.com/lcpz/dots/blob/master/bin/screenshot
-    awful.key({ altkey, "Control" }, "p", function() os.execute("screenshot") end,
+    awful.key({ altkey }, "p", function() os.execute(screenshot) end,
               {description = "take a screenshot", group = "hotkeys"}),
 
     -- X screen locker
