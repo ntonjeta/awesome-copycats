@@ -7,7 +7,7 @@ Themes for Awesome WM 4.x
 
 :Author: Luca CPZ
 :Version: git
-:License: BY-NC-SA_
+:License: BY-SA_
 :Source: https://github.com/lcpz/awesome-copycats
 
 Description
@@ -97,7 +97,7 @@ Installation
 .. code-block:: shell
 
     git clone --recurse-submodules --remote-submodules --depth 1 -j 2 https://github.com/lcpz/awesome-copycats.git
-    mv -bv awesome-copycats/{*,.[^.]*} ~/.config/awesome; rm -rf awesome-copycats
+    mkdir -p ~/.config/awesome && mv -bv awesome-copycats/{*,.[^.]*} ~/.config/awesome &&  rm -rf awesome-copycats
 
 In case you do not want the Git files, use the following as the second command:
 
@@ -159,7 +159,7 @@ Additional default software used: ::
 
     amixer dmenu librewolf mpc mpd scrot unclutter xbacklight xsel slock
 
-.. _BY-NC-SA: http://creativecommons.org/licenses/by-nc-sa/4.0
+.. _BY-SA: https://creativecommons.org/licenses/by-sa/4.0
 .. _Awesome: http://github.com/awesomeWM/awesome
 .. _branches: https://github.com/lcpz/awesome-copycats/branches
 .. _lucamanni: https://github.com/lucamanni/awesome
