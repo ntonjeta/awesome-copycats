@@ -418,8 +418,8 @@ globalkeys = mytable.join(
               {description = "quit awesome", group = "awesome"}),
 
     -- audio spawn pavucontroll 
-    awful.key({ modkey,           }, "a", function () awful.spawn(audio_control) end,
-              {description = "open a audio controll", group = "launcher"}),
+    --awful.key({ modkey,           }, "a", function () awful.spawn(audio_control) end,
+              --{description = "open a audio controll", group = "launcher"}),
 
     awful.key({ modkey, altkey    }, "l",     function () awful.tag.incmwfact( 0.05)          end,
               {description = "increase master width factor", group = "layout"}),
@@ -447,54 +447,54 @@ globalkeys = mytable.join(
     end, {description = "restore minimized", group = "client"}),
 
     -- Dropdown application
-    awful.key({ modkey, }, "z", function () awful.screen.focused().quake:toggle() end,
-              {description = "dropdown application", group = "launcher"}),
+    --awful.key({ modkey, }, "z", function () awful.screen.focused().quake:toggle() end,
+              --{description = "dropdown application", group = "launcher"}),
 
     -- Widgets popups
-    awful.key({ altkey, }, "c", function () if beautiful.cal then beautiful.cal.show(7) end end,
-              {description = "show calendar", group = "widgets"}),
-    awful.key({ altkey, }, "h", function () if beautiful.fs then beautiful.fs.show(7) end end,
-              {description = "show filesystem", group = "widgets"}),
-    awful.key({ altkey, }, "w", function () if beautiful.weather then beautiful.weather.show(7) end end,
-              {description = "show weather", group = "widgets"}),
+    --awful.key({ altkey, }, "c", function () if beautiful.cal then beautiful.cal.show(7) end end,
+              --{description = "show calendar", group = "widgets"}),
+    --awful.key({ altkey, }, "h", function () if beautiful.fs then beautiful.fs.show(7) end end,
+              --{description = "show filesystem", group = "widgets"}),
+    --awful.key({ altkey, }, "w", function () if beautiful.weather then beautiful.weather.show(7) end end,
+              --{description = "show weather", group = "widgets"}),
 
     -- Screen brightness
-    awful.key({ }, "XF86MonBrightnessUp", function () os.execute("xbacklight -inc 10") end,
-              {description = "+10%", group = "hotkeys"}),
-    awful.key({ }, "XF86MonBrightnessDown", function () os.execute("xbacklight -dec 10") end,
-              {description = "-10%", group = "hotkeys"}),
+    --awful.key({ }, "XF86MonBrightnessUp", function () os.execute("xbacklight -inc 10") end,
+              --{description = "+10%", group = "hotkeys"}),
+    --awful.key({ }, "XF86MonBrightnessDown", function () os.execute("xbacklight -dec 10") end,
+              --{description = "-10%", group = "hotkeys"}),
 
     -- ALSA volume control
-    awful.key({ altkey }, "Up",
-        function ()
-            os.execute(string.format("amixer -q set %s 1%%+", beautiful.volume.channel))
-            beautiful.volume.update()
-        end,
-        {description = "volume up", group = "hotkeys"}),
-    awful.key({ altkey }, "Down",
-        function ()
-            os.execute(string.format("amixer -q set %s 1%%-", beautiful.volume.channel))
-            beautiful.volume.update()
-        end,
-        {description = "volume down", group = "hotkeys"}),
-    awful.key({ altkey }, "m",
-        function ()
-            os.execute(string.format("amixer -q set %s toggle", beautiful.volume.togglechannel or beautiful.volume.channel))
-            beautiful.volume.update()
-        end,
-        {description = "toggle mute", group = "hotkeys"}),
-    awful.key({ altkey, "Control" }, "m",
-        function ()
-            os.execute(string.format("amixer -q set %s 100%%", beautiful.volume.channel))
-            beautiful.volume.update()
-        end,
-        {description = "volume 100%", group = "hotkeys"}),
-    awful.key({ altkey, "Control" }, "0",
-        function ()
-            os.execute(string.format("amixer -q set %s 0%%", beautiful.volume.channel))
-            beautiful.volume.update()
-        end,
-        {description = "volume 0%", group = "hotkeys"}),
+    --awful.key({ altkey }, "Up",
+        --function ()
+            --os.execute(string.format("amixer -q set %s 1%%+", beautiful.volume.channel))
+            --beautiful.volume.update()
+        --end,
+        --{description = "volume up", group = "hotkeys"}),
+    --awful.key({ altkey }, "Down",
+        --function ()
+            --os.execute(string.format("amixer -q set %s 1%%-", beautiful.volume.channel))
+            --beautiful.volume.update()
+        --end,
+        --{description = "volume down", group = "hotkeys"}),
+    --awful.key({ altkey }, "m",
+        --function ()
+            --os.execute(string.format("amixer -q set %s toggle", beautiful.volume.togglechannel or beautiful.volume.channel))
+            --beautiful.volume.update()
+        --end,
+        --{description = "toggle mute", group = "hotkeys"}),
+    --awful.key({ altkey, "Control" }, "m",
+        --function ()
+            --os.execute(string.format("amixer -q set %s 100%%", beautiful.volume.channel))
+            --beautiful.volume.update()
+        --end,
+        --{description = "volume 100%", group = "hotkeys"}),
+    --awful.key({ altkey, "Control" }, "0",
+        --function ()
+            --os.execute(string.format("amixer -q set %s 0%%", beautiful.volume.channel))
+            --beautiful.volume.update()
+        --end,
+        --{description = "volume 0%", group = "hotkeys"}),
 
     -- MPD control
     --awful.key({ altkey, "Control" }, "Up",
@@ -536,11 +536,11 @@ globalkeys = mytable.join(
         --{description = "mpc on/off", group = "widgets"}),
 
     -- Copy primary to clipboard (terminals to gtk)
-    awful.key({ modkey }, "c", function () awful.spawn.with_shell("xsel | xsel -i -b") end,
-              {description = "copy terminal to gtk", group = "hotkeys"}),
-    -- Copy clipboard to primary (gtk to terminals)
-    awful.key({ modkey }, "v", function () awful.spawn.with_shell("xsel -b | xsel") end,
-              {description = "copy gtk to terminal", group = "hotkeys"}),
+    --awful.key({ modkey }, "c", function () awful.spawn.with_shell("xsel | xsel -i -b") end,
+              --{description = "copy terminal to gtk", group = "hotkeys"}),
+    ---- Copy clipboard to primary (gtk to terminals)
+    --awful.key({ modkey }, "v", function () awful.spawn.with_shell("xsel -b | xsel") end,
+              --{description = "copy gtk to terminal", group = "hotkeys"}),
 
     -- User programs
     awful.key({ modkey }, "q", function () awful.spawn(browser) end,
@@ -569,6 +569,7 @@ globalkeys = mytable.join(
         end,
         {description = "show rofi", group = "launcher"}),
     --]]
+    --
     -- Prompt
     awful.key({ modkey }, "r", function () awful.screen.focused().mypromptbox:run() end,
               {description = "run prompt", group = "launcher"}),
