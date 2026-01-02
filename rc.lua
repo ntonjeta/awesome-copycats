@@ -103,13 +103,16 @@ local altkey       = "Mod1"
 local terminal     = "urxvtc"
 local editor       = os.getenv("EDITOR") or "vim"
 local gui_editor   = "code"
+local notes_editor = "obsidian"
 local browser      = "firefox"
 local chromium      = "chromium"
 local audio_control = "pavucontrol"
 local code_editor   = "code"
-local screenshot   = "/home/ntonjeta/.local/bin/screenshot"
+local screenshot   = "/home/ntonjeta/.local/bin/screenshot"  -- nope 
 local start_scrlocker = "/home/ntonjeta/.local/bin/lock_screen --start"
 local stop_scrlocker  = "/home/ntonjeta/.local/bin/lock_screen --stop"
+local vi_focus     = false -- vi-like client focus https://github.com/lcpz/awesome-copycats/issues/275
+local cycle_prev   = true  -- cycle with only the previously focused client or all https://github.com/lcpz/awesome-copycats/issues/274
 
 awful.util.terminal = terminal
 awful.util.dropdown_terminal = dropdown_terminal
@@ -409,23 +412,22 @@ globalkeys = mytable.join(
               {description = "reload awesome", group = "awesome"}),
     awful.key({ modkey, "Shift"   }, "q", awesome.quit,
               {description = "quit awesome", group = "awesome"}),
-
-    -- audio spawn pavucontroll 
-    --awful.key({ modkey,           }, "a", function () awful.spawn(audio_control) end,
-              --{description = "open a audio controll", group = "launcher"}),
-
+    -- resize the width 
     awful.key({ modkey, altkey    }, "l",     function () awful.tag.incmwfact( 0.05)          end,
               {description = "increase master width factor", group = "layout"}),
     awful.key({ modkey, altkey    }, "h",     function () awful.tag.incmwfact(-0.05)          end,
               {description = "decrease master width factor", group = "layout"}),
+    -- increase master client number 
     awful.key({ modkey, "Shift"   }, "h",     function () awful.tag.incnmaster( 1, nil, true) end,
               {description = "increase the number of master clients", group = "layout"}),
     awful.key({ modkey, "Shift"   }, "l",     function () awful.tag.incnmaster(-1, nil, true) end,
               {description = "decrease the number of master clients", group = "layout"}),
+    -- increase number of column 
     awful.key({ modkey, "Control" }, "h",     function () awful.tag.incncol( 1, nil, true)    end,
               {description = "increase the number of columns", group = "layout"}),
     awful.key({ modkey, "Control" }, "l",     function () awful.tag.incncol(-1, nil, true)    end,
               {description = "decrease the number of columns", group = "layout"}),
+    -- change layout
     awful.key({ modkey,           }, "space", function () awful.layout.inc( 1)                end,
               {description = "select next", group = "layout"}),
     awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(-1)                end,
@@ -451,18 +453,18 @@ globalkeys = mytable.join(
     
 
     -- Widgets popups
-    --awful.key({ altkey, }, "c", function () if beautiful.cal then beautiful.cal.show(7) end end,
-              --{description = "show calendar", group = "widgets"}),
+    awful.key({ altkey, }, "c", function () if beautiful.cal then beautiful.cal.show(7) end end,
+              {description = "show calendar", group = "widgets"}),
     --awful.key({ altkey, }, "h", function () if beautiful.fs then beautiful.fs.show(7) end end,
               --{description = "show filesystem", group = "widgets"}),
     --awful.key({ altkey, }, "w", function () if beautiful.weather then beautiful.weather.show(7) end end,
               --{description = "show weather", group = "widgets"}),
 
     -- Screen brightness
-    --awful.key({ }, "XF86MonBrightnessUp", function () os.execute("xbacklight -inc 10") end,
-              --{description = "+10%", group = "hotkeys"}),
-    --awful.key({ }, "XF86MonBrightnessDown", function () os.execute("xbacklight -dec 10") end,
-              --{description = "-10%", group = "hotkeys"}),
+    awful.key({ }, "XF86MonBrightnessUp", function () os.execute("xbacklight -inc 10") end,
+              {description = "+10%", group = "hotkeys"}),
+    awful.key({ }, "XF86MonBrightnessDown", function () os.execute("xbacklight -dec 10") end,
+              {description = "-10%", group = "hotkeys"}),
 
     -- ALSA volume control
     --awful.key({ altkey }, "Up",
@@ -496,45 +498,6 @@ globalkeys = mytable.join(
         --end,
         --{description = "volume 0%", group = "hotkeys"}),
 
-    -- MPD control
-    --awful.key({ altkey, "Control" }, "Up",
-        --function ()
-            --os.execute("mpc toggle")
-            --beautiful.mpd.update()
-        --end,
-        --{description = "mpc toggle", group = "widgets"}),
-    --awful.key({ altkey, "Control" }, "Down",
-        --function ()
-            --os.execute("mpc stop")
-            --beautiful.mpd.update()
-        --end,
-        --{description = "mpc stop", group = "widgets"}),
-    --awful.key({ altkey, "Control" }, "Left",
-        --function ()
-            --os.execute("mpc prev")
-            --beautiful.mpd.update()
-        --end,
-        --{description = "mpc prev", group = "widgets"}),
-    --awful.key({ altkey, "Control" }, "Right",
-        --function ()
-            --os.execute("mpc next")
-            --beautiful.mpd.update()
-        --end,
-        --{description = "mpc next", group = "widgets"}),
-    --awful.key({ altkey }, "0",
-        --function ()
-            --local common = { text = "MPD widget ", position = "top_middle", timeout = 2 }
-            --if beautiful.mpd.timer.started then
-                --beautiful.mpd.timer:stop()
-                --common.text = common.text .. lain.util.markup.bold("OFF")
-            --else
-                --beautiful.mpd.timer:start()
-                --common.text = common.text .. lain.util.markup.bold("ON")
-            --end
-            --naughty.notify(common)
-        --end,
-        --{description = "mpc on/off", group = "widgets"}),
-
     -- Copy primary to clipboard (terminals to gtk)
     --awful.key({ modkey }, "c", function () awful.spawn.with_shell("xsel | xsel -i -b") end,
               --{description = "copy terminal to gtk", group = "hotkeys"}),
@@ -545,12 +508,10 @@ globalkeys = mytable.join(
     -- User programs
     awful.key({ modkey }, "q", function () awful.spawn(browser) end,
               {description = "run browser", group = "launcher"}),
-    awful.key({ modkey, "Control" }, "q", function () awful.spawn(chromium) end,
-              {description = "run chromium", group = "launcher"}),
-    awful.key({ modkey }, "a", function () awful.spawn(audio_control) end,
-              {description = "run audio controlelr", group = "launcher"}),
-    awful.key({ modkey }, "c", function () awful.spawn(code_editor) end,
-              {description = "run code editor", group = "launcher"}),
+    awful.key({ modkey }, "a", function () awful.spawn(gui_editor) end,
+              {description = "run gui editor", group = "launcher"}),
+    awful.key({ modkey }, "s", function () awful.spawn(notes_editor) end,
+              {description = "run gui editor", group = "launcher"}),
 
     -- Default
     --[[ Menubar
