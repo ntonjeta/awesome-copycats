@@ -510,7 +510,7 @@ globalkeys = mytable.join(
               {description = "run browser", group = "launcher"}),
     awful.key({ modkey }, "a", function () awful.spawn(gui_editor) end,
               {description = "run gui editor", group = "launcher"}),
-    awful.key({ modkey }, "s", function () awful.spawn(notes_editor) end,
+    awful.key({ modkey }, "d", function () awful.spawn(notes_editor) end,
               {description = "run gui editor", group = "launcher"}),
 
     -- Default
