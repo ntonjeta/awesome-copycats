@@ -105,9 +105,9 @@ local editor       = os.getenv("EDITOR") or "vim"
 local gui_editor   = "code"
 local notes_editor = "obsidian"
 local browser      = "firefox"
-local chromium      = "chromium"
+local chromium     = "chromium"
+local email        = "thunderbird"
 local audio_control = "pavucontrol"
-local code_editor   = "code"
 local screenshot   = "/home/ntonjeta/.local/bin/screenshot"  -- nope 
 local start_scrlocker = "/home/ntonjeta/.local/bin/lock_screen --start"
 local stop_scrlocker  = "/home/ntonjeta/.local/bin/lock_screen --stop"
@@ -508,10 +508,14 @@ globalkeys = mytable.join(
     -- User programs
     awful.key({ modkey }, "q", function () awful.spawn(browser) end,
               {description = "run browser", group = "launcher"}),
+    awful.key({ modkey }, "c", function () awful.spawn(chromium) end,
+              {description = "run browser", group = "launcher"}),
     awful.key({ modkey }, "a", function () awful.spawn(gui_editor) end,
               {description = "run gui editor", group = "launcher"}),
     awful.key({ modkey }, "d", function () awful.spawn(notes_editor) end,
-              {description = "run gui editor", group = "launcher"}),
+              {description = "run notes editor", group = "launcher"}),
+    awful.key({ modkey }, "e", function () awful.spawn(email) end,
+              {description = "run email", group = "launcher"}),
 
     -- Default
     --[[ Menubar
