@@ -441,9 +441,9 @@ globalkeys = mytable.join(
 	awful.key({ modkey }, "q", function()
 		awful.spawn(browser)
 	end, { description = "run browser", group = "launcher" }),
-	awful.key({ modkey }, "c", function()
-		awful.spawn(chromium)
-	end, { description = "run browser", group = "launcher" }),
+	--awful.key({ modkey }, "c", function()
+		--awful.spawn(chromium)
+	--end, { description = "run browser", group = "launcher" }),
 	awful.key({ modkey }, "a", function()
 		awful.spawn(gui_editor)
 	end, { description = "run gui editor", group = "launcher" }),
@@ -559,51 +559,12 @@ globalkeys = mytable.join(
         beautiful.volume.update()
         end,
         {description = "volume 0%", group = "hotkeys"}),
-
-	-- Copy primary to clipboard (terminals to gtk)
-	--awful.key({ modkey }, "c", function () awful.spawn.with_shell("xsel | xsel -i -b") end,
-	--{description = "copy terminal to gtk", group = "hotkeys"}),
-	---- Copy clipboard to primary (gtk to terminals)
-	--awful.key({ modkey }, "v", function () awful.spawn.with_shell("xsel -b | xsel") end,
-	--{description = "copy gtk to terminal", group = "hotkeys"}),
-
-	-- Default
-	--[[ Menubar
-    awful.key({ modkey }, "p", function() menubar.show() end,
-              {description = "show the menubar", group = "launcher"}),
-    --]]
-	--[[ dmenu
-    awful.key({ modkey }, "x", function ()
-            os.execute(string.format("dmenu_run -i -fn 'Monospace' -nb '%s' -nf '%s' -sb '%s' -sf '%s'",
-            beautiful.bg_normal, beautiful.fg_normal, beautiful.bg_focus, beautiful.fg_focus))
-        end,
-        {description = "show dmenu", group = "launcher"}),
-    --]]
-	-- alternatively use rofi, a dmenu-like application with more features
-	-- check https://github.com/DaveDavenport/rofi for more details
-	--[[ rofi
-    awful.key({ modkey }, "x", function ()
-            os.execute(string.format("rofi -show %s -theme %s",
-            'run', 'dmenu'))
-        end,
-        {description = "show rofi", group = "launcher"}),
-    --]]
-	--
 	-- Prompt
 	awful.key({ modkey }, "r", function()
 		awful.screen.focused().mypromptbox:run()
 	end, { description = "run prompt", group = "launcher" })
 
         )
-        -- TODO never run lua script 
-	--awful.key({ modkey }, "x", function()
-		--awful.prompt.run({
-			--prompt = "Run Lua code: ",
-			--textbox = awful.screen.focused().mypromptbox.widget,
-			--exe_callback = awful.util.eval,
-			--history_path = awful.util.get_cache_dir() .. "/history_eval",
-		--})
-	--end, { description = "lua execute prompt", group = "awesome" })
 
 clientkeys = mytable.join(
 	awful.key({ altkey, "Shift" }, "m", lain.util.magnify_client, { description = "magnify client", group = "client" }),
